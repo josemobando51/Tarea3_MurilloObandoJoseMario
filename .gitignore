@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Base del profesor
+base/
+
+# Datos generados
+data/*.csv
+
+# Archivos temporales de RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
