@@ -1,0 +1,26 @@
+
+---
+format: html
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+source("cod/funciones_tarea3.R")
+
+datos <- read.csv("data/transacciones_2025.csv", sep = ";")
+parametros <- read.csv("config/parametros_tarea3.csv", sep = ";")
+
+ventana <- as.numeric(parametros$valor[parametros$parametro == "ventana"])
+k.alerta <- as.numeric(parametros$valor[parametros$parametro == "k.alerta"])
+
+resultado1 <- alerta.movil(datos, ventana, k.alerta)
+resultado1.comun <- alerta.movil(datos, 7, 2)
+
+cat("RESULTADO_1A =", sum(resultado1$alerta), "\n")
+cat("RESULTADO_1B =", as.character(min(resultado1$fecha[resultado1$alerta])), "\n")
+cat("RESULTADO_1C =", sum(resultado1.comun$alerta), "\n")
+```
+
