@@ -57,3 +57,26 @@ ggsave(
 )
 ```
 
+
+## Ejercicio 2: Ley de Benford por cantón
+
+```{r}
+cantones <- read.csv("data/cantones.csv")
+
+canal.benford <- parametros$valor[
+  parametros$parametro == "canal.benford"
+]
+
+resultado2 <- benford.canton(datos, canal.benford, cantones)
+
+resultado2.web <- benford.canton(datos, "Web", cantones)
+
+resultado.2a <- benford.mad(
+  datos$monto_crc[datos$canal == canal.benford]
+)
+
+cat("RESULTADO_2A =", sprintf("%.4f", resultado.2a), "\n")
+cat("RESULTADO_2B =", resultado2$canton[1], "\n")
+cat("RESULTADO_2C =", sum(resultado2$mad > 0.015), "\n")
+cat("RESULTADO_2D =", resultado2.web$canton[1], "\n")
+```
