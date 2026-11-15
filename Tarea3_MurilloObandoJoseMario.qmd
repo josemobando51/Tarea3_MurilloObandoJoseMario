@@ -24,3 +24,36 @@ cat("RESULTADO_1B =", as.character(min(resultado1$fecha[resultado1$alerta])), "\
 cat("RESULTADO_1C =", sum(resultado1.comun$alerta), "\n")
 ```
 
+
+
+## Ejercicio 1: Alertas por ventana móvil
+
+```{r}
+library(ggplot2)
+
+grafico1 <- ggplot(resultado1, aes(x = fecha, y = n.tx)) +
+  geom_line(color = "#2563A6", linewidth = 0.5) +
+  geom_point(
+    data = resultado1[resultado1$alerta, ],
+    color = "#D62828",
+    size = 1.8
+  ) +
+  labs(
+    title = "Monitoreo diario de transacciones - 2025",
+    subtitle = "Los puntos rojos representan días con alerta",
+    x = "Fecha",
+    y = "Cantidad de transacciones"
+  ) +
+  theme_minimal()
+
+print(grafico1)
+
+ggsave(
+  "info/figuras/ej1_alertas.png",
+  plot = grafico1,
+  width = 11,
+  height = 5.5,
+  dpi = 300
+)
+```
+
