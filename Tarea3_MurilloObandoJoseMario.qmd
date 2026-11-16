@@ -186,3 +186,52 @@ cat("RESULTADO_3A =", sprintf("%.2f", resultado3$va), "\n")
 cat("RESULTADO_3B =", sprintf("%.2f", resultado3$interes), "\n")
 cat("RESULTADO_3C =", sprintf("%.2f", resultado3.comun$va), "\n")
 ```
+
+
+
+### Comparación de montos mensuales y valor acumulado
+
+```{r}
+library(ggplot2)
+
+# Preparar datos para el grafico
+tabla3 <- resultado3$tabla
+
+grafico.datos <- data.frame(
+  mes = rep(1:12, 2),
+  valor = c(tabla3$monto, tabla3$monto * tabla3$factor),
+  tipo = rep(c("Monto depositado", "Valor acumulado"), each = 12)
+)
+
+# Crear el grafico
+grafico3 <- ggplot(
+  grafico.datos,
+  aes(x = factor(mes), y = valor, fill = tipo)
+) +
+  geom_col(position = "dodge", width = 0.75) +
+  scale_fill_manual(values = c(
+    "Monto depositado" = "#2563A6",
+    "Valor acumulado" = "#D62828"
+  )) +
+  scale_y_continuous(
+    labels = function(x) paste0(round(x / 1e6), " M")
+  ) +
+  labs(
+    title = "Valor acumulado de transacciones - 2025",
+    subtitle = "Comparacion de depositos mensuales y valor al 31 de diciembre",
+    x = "Mes",
+    y = "Monto en millones de colones",
+    fill = "Concepto"
+  ) +
+  theme_minimal()
+
+print(grafico3)
+
+ggsave(
+  "info/figuras/ej3_interes.png",
+  plot = grafico3,
+  width = 11,
+  height = 6,
+  dpi = 300
+)
+```
