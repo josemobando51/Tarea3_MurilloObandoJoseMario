@@ -148,3 +148,17 @@ ggsave(
   dpi = 300
 )
 ```
+
+
+
+### Conclusión del ejercicio 2
+
+```{r}
+cat(
+  "El cantón", resultado2$canton[1],
+  "presenta la mayor MAD (",
+  round(resultado2$mad[1], 4),
+  ") con", resultado2$n[1],
+  "transacciones; esta desviación no demuestra fraude por sí sola y debe evaluarse considerando el tamaño de la muestra."
+)
+```
