@@ -7,6 +7,46 @@ execute:
   message: false
 ---
 
+## Resumen de resultados
+
+```{r}
+source("cod/funciones_tarea3.R")
+
+datos <- read.csv("data/transacciones_2025.csv", sep = ";")
+parametros <- read.csv("config/parametros_tarea3.csv", sep = ";")
+cantones <- read.csv("data/cantones.csv")
+
+param <- function(nombre) {
+  parametros$valor[parametros$parametro == nombre]
+}
+
+r1 <- alerta.movil(datos, as.numeric(param("ventana")),
+                   as.numeric(param("k.alerta")))
+r1c <- alerta.movil(datos, 7, 2)
+
+r2 <- benford.canton(datos, param("canal.benford"), cantones)
+r2w <- benford.canton(datos, "Web", cantones)
+mad2 <- benford.mad(
+  datos$monto_crc[datos$canal == param("canal.benford")]
+)
+
+r3 <- valor.acumulado(datos, as.numeric(param("tasa.anual")),
+                       param("canal.interes"))
+r3c <- valor.acumulado(datos, 0.06, "App")
+
+cat("RESULTADO_1A =", sum(r1$alerta), "\n")
+cat("RESULTADO_1B =", as.character(min(r1$fecha[r1$alerta])), "\n")
+cat("RESULTADO_1C =", sum(r1c$alerta), "\n")
+cat("RESULTADO_2A =", sprintf("%.4f", mad2), "\n")
+cat("RESULTADO_2B =", r2$canton[1], "\n")
+cat("RESULTADO_2C =", sum(r2$mad > 0.015), "\n")
+cat("RESULTADO_2D =", r2w$canton[1], "\n")
+cat("RESULTADO_3A =", sprintf("%.2f", r3$va), "\n")
+cat("RESULTADO_3B =", sprintf("%.2f", r3$interes), "\n")
+cat("RESULTADO_3C =", sprintf("%.2f", r3c$va), "\n")
+```
+
+
 ```{r}
 source("cod/funciones_tarea3.R")
 
