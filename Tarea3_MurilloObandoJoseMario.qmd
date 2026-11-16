@@ -162,3 +162,27 @@ cat(
   "transacciones; esta desviación no demuestra fraude por sí sola y debe evaluarse considerando el tamaño de la muestra."
 )
 ```
+
+
+
+## Ejercicio 3: Valor acumulado con interés
+
+```{r}
+tasa.anual <- as.numeric(
+  parametros$valor[parametros$parametro == "tasa.anual"]
+)
+
+canal.interes <- parametros$valor[
+  parametros$parametro == "canal.interes"
+]
+
+resultado3 <- valor.acumulado(
+  datos, tasa.anual, canal.interes
+)
+
+resultado3.comun <- valor.acumulado(datos, 0.06, "App")
+
+cat("RESULTADO_3A =", sprintf("%.2f", resultado3$va), "\n")
+cat("RESULTADO_3B =", sprintf("%.2f", resultado3$interes), "\n")
+cat("RESULTADO_3C =", sprintf("%.2f", resultado3.comun$va), "\n")
+```
