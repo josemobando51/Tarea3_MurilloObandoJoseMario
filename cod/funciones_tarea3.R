@@ -35,3 +35,63 @@ alerta.movil <- function(df, ventana, k.alerta) {
   
   return(diario)
 }
+
+
+# Recibe: un vector de montos.
+# Devuelve: la desviacion absoluta media de Benford.
+
+benford.mad <- function(x) {
+  
+  x <- x[!is.na(x) & x > 0]
+  
+  digito <- floor(x / 10^floor(log10(x)))
+  
+  frecuencia <- table(factor(digito, levels = 1:9))
+  
+  p <- as.numeric(frecuencia) / length(x)
+  
+  benford <- log10(1 + 1 / (1:9))
+  
+  mad <- mean(abs(p - benford))
+  
+  return(mad)
+}
+
+
+# Recibe: transacciones, canal y catalogo de cantones.
+# Devuelve: tabla por canton con n, MAD y clasificacion.
+
+benford.canton <- function(df, canal, cantones) {
+  
+  datos.canal <- df[df$canal == canal &
+                      !is.na(df$monto_crc) &
+                      df$monto_crc > 0, ]
+  
+  grupos <- split(datos.canal$monto_crc,
+                  datos.canal$cod_canton)
+  
+  resultado <- data.frame(
+    cod_canton = as.integer(names(grupos)),
+    n = lengths(grupos),
+    mad = sapply(grupos, benford.mad)
+  )
+  
+  resultado <- merge(resultado, cantones,
+                     by = "cod_canton")
+  
+  resultado$clase <- ifelse(
+    resultado$mad <= 0.006, "conformidad cercana",
+    ifelse(resultado$mad <= 0.012, "conformidad aceptable",
+           ifelse(resultado$mad <= 0.015, "conformidad marginal",
+                  "no conformidad"))
+  )
+  
+  resultado <- resultado[order(-resultado$mad),
+                         c("cod_canton", "canton",
+                           "n", "mad", "clase")]
+  
+  rownames(resultado) <- NULL
+  
+  return(resultado)
+}
+

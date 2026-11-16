@@ -57,3 +57,108 @@ ggsave(
 )
 ```
 
+
+## Ejercicio 2: Ley de Benford por cantón
+
+```{r}
+cantones <- read.csv("data/cantones.csv")
+
+canal.benford <- parametros$valor[
+  parametros$parametro == "canal.benford"
+]
+
+resultado2 <- benford.canton(datos, canal.benford, cantones)
+
+resultado2.web <- benford.canton(datos, "Web", cantones)
+
+resultado.2a <- benford.mad(
+  datos$monto_crc[datos$canal == canal.benford]
+)
+
+cat("RESULTADO_2A =", sprintf("%.4f", resultado.2a), "\n")
+cat("RESULTADO_2B =", resultado2$canton[1], "\n")
+cat("RESULTADO_2C =", sum(resultado2$mad > 0.015), "\n")
+cat("RESULTADO_2D =", resultado2.web$canton[1], "\n")
+```
+
+
+### Comparación con la Ley de Benford
+
+```{r}
+library(ggplot2)
+
+# Seleccionar los montos del canal
+montos <- datos$monto_crc[
+  datos$canal == canal.benford &
+  !is.na(datos$monto_crc) &
+  datos$monto_crc > 0
+]
+
+# Obtener el primer digito
+digitos <- floor(montos / 10^floor(log10(montos)))
+
+# Calcular las proporciones
+p.observada <- as.numeric(
+  table(factor(digitos, levels = 1:9))
+) / length(montos)
+
+p.teorica <- log10(1 + 1 / (1:9))
+
+# Crear tabla para el grafico
+tabla.benford <- data.frame(
+  digito = 1:9,
+  p.observada = p.observada,
+  p.teorica = p.teorica
+)
+
+# Crear grafico
+grafico2 <- ggplot(tabla.benford, aes(x = digito)) +
+  geom_col(
+    aes(y = p.observada),
+    fill = "#2563A6",
+    width = 0.7
+  ) +
+  geom_line(
+    aes(y = p.teorica),
+    color = "#D62828",
+    linewidth = 1
+  ) +
+  geom_point(
+    aes(y = p.teorica),
+    color = "#D62828",
+    size = 2
+  ) +
+  scale_x_continuous(breaks = 1:9) +
+  labs(
+    title = "Ley de Benford - SINPE Movil",
+    subtitle = "Barras: proporcion observada | Linea: Benford",
+    x = "Primer digito del monto",
+    y = "Proporcion de transacciones"
+  ) +
+  theme_minimal()
+
+print(grafico2)
+
+# Guardar el grafico
+ggsave(
+  "info/figuras/ej2_benford.png",
+  plot = grafico2,
+  width = 10,
+  height = 6,
+  dpi = 300
+)
+```
+
+
+
+### Conclusión del ejercicio 2
+
+```{r}
+cat(
+  "El cantón", resultado2$canton[1],
+  "presenta la mayor MAD (",
+  round(resultado2$mad[1], 4),
+  ") con", resultado2$n[1],
+  "transacciones; esta desviación no demuestra fraude por sí sola y debe evaluarse considerando el tamaño de la muestra."
+)
+```
