@@ -95,3 +95,49 @@ benford.canton <- function(df, canal, cantones) {
   return(resultado)
 }
 
+
+
+# Recibe: transacciones, tasa anual y canal.
+# Devuelve: tabla mensual, tasa mensual, VA e intereses.
+
+valor.acumulado <- function(df, tasa.anual, canal) {
+  
+  datos.canal <- df[df$canal == canal, ]
+  
+  datos.canal$mes <- as.integer(
+    format(as.Date(datos.canal$fecha), "%m")
+  )
+  
+  montos <- aggregate(
+    monto_crc ~ mes,
+    data = datos.canal,
+    FUN = sum
+  )
+  
+  tabla <- data.frame(mes = 1:12)
+  
+  tabla <- merge(tabla, montos,
+                 by = "mes", all.x = TRUE)
+  
+  tabla$monto <- ifelse(
+    is.na(tabla$monto_crc), 0, tabla$monto_crc
+  )
+  
+  tabla$monto_crc <- NULL
+  
+  tasa.mensual <- (1 + tasa.anual)^(1/12) - 1
+  
+  tabla$factor <- (1 + tasa.mensual)^(12 - tabla$mes)
+  
+  va <- sum(tabla$monto * tabla$factor)
+  
+  interes <- va - sum(tabla$monto)
+  
+  return(list(
+    tabla = tabla,
+    tasa.mensual = tasa.mensual,
+    va = va,
+    interes = interes
+  ))
+}
+
